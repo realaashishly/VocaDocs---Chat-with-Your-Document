@@ -9,30 +9,27 @@ export const appRouter = router({
       const { getUser } = getKindeServerSession();
       const user = await getUser();
 
-      console.log(user);
-
       if (!user?.id || !user?.email) {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "User ID or email missing" });
       }
 
       // Check if the user is in the database
       const dbUser = await db.user.findFirst({
-        where: {
-          id: user.id,
-        },
+        where: { id: user.id },
       });
 
       if (!dbUser) {
         await db.user.create({
-          data: {
-            id: user.id,
-            email: user.email,
-          },
+          data: { id: user.id, email: user.email },
         });
       }
 
       return { success: true };
     } catch (error) {
+      if (error instanceof TRPCError) {
+        throw error;
+      }
+
       console.error('Error in authCallback:', error);
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
