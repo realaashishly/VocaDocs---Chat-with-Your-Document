@@ -17,7 +17,7 @@ export default function UploadButton() {
         </DialogTrigger>
 
         <DialogContent>
-            content
+            
         </DialogContent>
     </Dialog>
   )
